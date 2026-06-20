@@ -11,7 +11,6 @@ st.set_page_config(
 from modules.watchlist import render_watchlist
 from modules.technical import render_technical
 from modules.fundamental import render_fundamental
-from modules.foreign_flow import render_foreign_flow
 
 
 @st.cache_data(ttl=3600)
@@ -95,13 +94,11 @@ if not selected:
     st.stop()
 
 if mode == "Trader":
-    tab1, tab2, tab3 = st.tabs(["Watchlist", "Technical", "Foreign Flow"])
+    tab1, tab2 = st.tabs(["Watchlist", "Technical"])
     with tab1:
         render_watchlist(selected)
     with tab2:
         render_technical(selected)
-    with tab3:
-        render_foreign_flow(selected)
 
 elif mode == "Investor":
     tab1, tab2 = st.tabs(["Watchlist", "Fundamental"])
