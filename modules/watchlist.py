@@ -40,6 +40,17 @@ def render_watchlist(tickers: list):
 
     df_table = pd.DataFrame(rows)
 
+    # Toggle mode ringkas untuk layar kecil (HP/tablet)
+    compact = st.toggle(
+        "📱 Mode ringkas (untuk HP)",
+        value=False,
+        help="Sembunyiin kolom Nama, Volume, dan RSI angka biar tabel muat di layar kecil"
+    )
+
+    if compact:
+        display_cols = ["Ticker", "Harga (IDR)", "% Change", "RSI Signal", "MA Signal"]
+        df_table = df_table[display_cols]
+
     def color_pct(val):
         if pd.isna(val):
             return ""
@@ -57,18 +68,20 @@ def render_watchlist(tickers: list):
             return ""
         return "color: orange; font-weight: bold" if val >= 2.0 else ""
 
-    styled = (
-        df_table.style
-        .map(color_pct, subset=["% Change"])
-        .map(color_signal, subset=["RSI Signal", "MA Signal"])
-        .map(color_vol, subset=["Vol Ratio (vs MA20)"])
-        .format({
-            "Harga (IDR)": lambda x: f"Rp {x:,.0f}" if x else "-",
-            "% Change": lambda x: f"{x:+.2f}%" if x else "-",
-            "Volume": lambda x: f"{x:,.0f}" if x else "-",
-            "Vol Ratio (vs MA20)": lambda x: f"{x:.2f}x" if x else "-",
-        })
-    )
+    style_chain = df_table.style.map(color_pct, subset=["% Change"])
+    style_chain = style_chain.map(color_signal, subset=["RSI Signal", "MA Signal"])
+
+    format_dict = {
+        "Harga (IDR)": lambda x: f"Rp {x:,.0f}" if x else "-",
+        "% Change": lambda x: f"{x:+.2f}%" if x else "-",
+    }
+
+    if not compact:
+        style_chain = style_chain.map(color_vol, subset=["Vol Ratio (vs MA20)"])
+        format_dict["Volume"] = lambda x: f"{x:,.0f}" if x else "-"
+        format_dict["Vol Ratio (vs MA20)"] = lambda x: f"{x:.2f}x" if x else "-"
+
+    styled = style_chain.format(format_dict)
 
     st.dataframe(styled, use_container_width=True, hide_index=True)
 

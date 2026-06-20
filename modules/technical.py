@@ -26,19 +26,29 @@ def render_technical(tickers: list):
     ma_signal, ma_color = get_ma_signal(df)
     rsi_label, rsi_color = get_rsi_signal(rsi_val)
 
-    # Quick stats row
-    c1, c2, c3, c4 = st.columns(4)
     last_close = df["Close"].iloc[-1]
     prev_close = df["Close"].iloc[-2]
     pct = (last_close - prev_close) / prev_close * 100
-
-    c1.metric("Harga", f"Rp {last_close:,.0f}", f"{pct:+.2f}%")
-    c2.metric("RSI 14", f"{rsi_val:.1f}", rsi_label)
-    c3.metric("MA Signal", ma_signal)
     vol_ratio = df["Volume"].iloc[-1] / df["Volume"].tail(20).mean()
-    c4.metric("Vol Ratio", f"{vol_ratio:.2f}x")
+
+    # Quick stats: 2x2 grid biar tetap kebaca di layar sempit
+    r1c1, r1c2 = st.columns(2)
+    r1c1.metric("Harga", f"Rp {last_close:,.0f}", f"{pct:+.2f}%")
+    r1c2.metric("RSI 14", f"{rsi_val:.1f}", rsi_label)
+
+    r2c1, r2c2 = st.columns(2)
+    r2c1.metric("MA Signal", ma_signal)
+    r2c2.metric("Vol Ratio", f"{vol_ratio:.2f}x")
 
     st.divider()
+
+    # Toggle mode ringkas untuk chart yang lebih pendek di HP
+    compact_chart = st.toggle(
+        "📱 Chart ringkas (untuk HP)",
+        value=False,
+        help="Perpendek tinggi chart biar pas di layar HP tanpa banyak scroll"
+    )
+    chart_height = 380 if compact_chart else 550
 
     # Chart: candlestick + MA + RSI
     fig = make_subplots(
@@ -82,7 +92,7 @@ def render_technical(tickers: list):
 
     fig.update_layout(
         xaxis_rangeslider_visible=False,
-        height=550,
+        height=chart_height,
         margin=dict(l=0, r=0, t=10, b=0),
         legend=dict(orientation="h", y=1.02),
         plot_bgcolor="rgba(0,0,0,0)",

@@ -59,8 +59,8 @@ def render_fundamental(tickers: list):
         "gray": "background:#F0F0EE;color:#6B6B68;",
     }
 
-    c1, c2, c3, c4 = st.columns(4)
-    with c1:
+    r1c1, r1c2 = st.columns(2)
+    with r1c1:
         st.metric(
             "PER", fmt(per, decimals=1, suffix="x"),
             help="Label relatif terhadap rata-rata PER saham ini sendiri 2 tahun terakhir, bukan valuasi absolut"
@@ -71,7 +71,7 @@ def render_fundamental(tickers: list):
                 unsafe_allow_html=True
             )
             st.caption(per_detail)
-    with c2:
+    with r1c2:
         st.metric(
             "PBV", fmt(pbv, decimals=2, suffix="x"),
             help="Label relatif terhadap rata-rata PBV saham ini sendiri 2 tahun terakhir, bukan valuasi absolut"
@@ -82,9 +82,11 @@ def render_fundamental(tickers: list):
                 unsafe_allow_html=True
             )
             st.caption(pbv_detail)
-    with c3:
+
+    r2c1, r2c2 = st.columns(2)
+    with r2c1:
         st.metric("EPS", fmt(eps, prefix="Rp ", decimals=0))
-    with c4:
+    with r2c2:
         st.metric("Div Yield", fmt(data.get("dividend_yield"), suffix="%", decimals=2)
                   if data.get("dividend_yield") else "-")
 
@@ -101,13 +103,14 @@ def render_fundamental(tickers: list):
 
     # Profitabilitas
     st.markdown("**Profitabilitas**")
-    c1, c2, c3 = st.columns(3)
     roe = data.get("roe")
     der = data.get("der")
     mktcap = data.get("market_cap")
-    c1.metric("ROE", f"{roe*100:.1f}%" if roe else "-")
-    c2.metric("DER", f"{der:.2f}x" if der else "-")
-    c3.metric("Market Cap", fmt(mktcap, prefix="Rp ", billions=True) if mktcap else "-")
+
+    r3c1, r3c2 = st.columns(2)
+    r3c1.metric("ROE", f"{roe*100:.1f}%" if roe else "-")
+    r3c2.metric("DER", f"{der:.2f}x" if der else "-")
+    st.metric("Market Cap", fmt(mktcap, prefix="Rp ", billions=True) if mktcap else "-")
 
     st.divider()
 
