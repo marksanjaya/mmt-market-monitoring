@@ -11,6 +11,7 @@ st.set_page_config(
 from modules.watchlist import render_watchlist
 from modules.technical import render_technical
 from modules.fundamental import render_fundamental
+from modules.screener import render_trader_screener, render_investor_screener
 
 
 @st.cache_data(ttl=3600)
@@ -94,15 +95,19 @@ if not selected:
     st.stop()
 
 if mode == "Trader":
-    tab1, tab2 = st.tabs(["Watchlist", "Technical"])
+    tab1, tab2, tab3 = st.tabs(["Watchlist", "Technical", "Screener"])
     with tab1:
         render_watchlist(selected)
     with tab2:
         render_technical(selected)
+    with tab3:
+        render_trader_screener(selected)
 
 elif mode == "Investor":
-    tab1, tab2 = st.tabs(["Watchlist", "Fundamental"])
+    tab1, tab2, tab3 = st.tabs(["Watchlist", "Fundamental", "Screener"])
     with tab1:
         render_watchlist(selected)
     with tab2:
         render_fundamental(selected)
+    with tab3:
+        render_investor_screener(selected)
